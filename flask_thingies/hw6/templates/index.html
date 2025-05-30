@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Піцерія</title>
+    <style>
+        #weather {
+            border: 2px solid #ccc;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ласкаво просимо до нашої піцерії!</h1>
+
+    <div id="weather">
+        {% if error %}
+            <p>{{ error }}</p>
+        {% else %}
+            <h3>Погода у місті {{ city }} на {{ date }}</h3>
+            <p>Температура: {{ temp }}°C</p>
+            <p>Опис: {{ description }}</p>
+            <hr>
+            <p><strong>{{ recommendation }}</strong></p>
+        {% endif %}
+    </div>
+</body>
+</html>
