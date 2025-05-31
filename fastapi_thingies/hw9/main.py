@@ -5,8 +5,6 @@ from datetime import datetime
 
 app = FastAPI()
 
-# ----- Pydantic Models -----
-
 class Order(BaseModel):
     product_name: str = Field(..., min_length=1, description="Назва продукту не може бути порожньою")
     quantity: int = Field(default=1, gt=0, description="Кількість має бути більше нуля")
@@ -23,10 +21,7 @@ class User(BaseModel):
     email: EmailStr
     orders: List[Order] = []
 
-# ----- In-memory "database" -----
 users_db: dict[str, User] = {}
-
-# ----- API Routes -----
 
 @app.post("/users/", response_model=User)
 def create_user(user: User):
