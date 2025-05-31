@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, validator
 from typing import List
 from datetime import datetime
@@ -9,40 +9,40 @@ class Movie(BaseModel):
     id: int
     title: str = Field(..., min_length=1)
     director: str = Field(..., min_length=1)
-    release_year: int
-    rating: float = Field(..., ge=0, le=10)
+    release_year: int = Field(..., ge=1888)
+    rating: float = Field(..., ge=0.0, le=10.0)
 
-    @validator("release_year")
-    def check_release_year(cls, v):
+    @validator('release_year')
+    def check_release_year(cls, value):
         current_year = datetime.now().year
-        if v > current_year:
-            raise ValueError(f"Release year cannot be in the future ({current_year})")
-        return v
+        if value > current_year:
+            raise ValueError("Рік випуску не може бути у майбутньому")
+        return value
 
 movies_db: List[Movie] = []
 
 @app.get("/movies", response_model=List[Movie])
-def get_all_movies():
+def get_movies():
     return movies_db
 
 @app.post("/movies", response_model=Movie)
 def add_movie(movie: Movie):
-    if any(m.id == movie.id for m in movies_db):
-        raise HTTPException(status_code=400, detail="Movie with this ID already exists.")
+    if any(existing.id == movie.id for existing in movies_db):
+        raise HTTPException(status_code=400, detail="Фільм з таким ID вже існує")
     movies_db.append(movie)
     return movie
 
-@app.get("/movies/{id}", response_model=Movie)
-def get_movie_by_id(id: int = Path(..., gt=0)):
+@app.get("/movies/{movie_id}", response_model=Movie)
+def get_movie(movie_id: int):
     for movie in movies_db:
-        if movie.id == id:
+        if movie.id == movie_id:
             return movie
-    raise HTTPException(status_code=404, detail="Movie not found.")
+    raise HTTPException(status_code=404, detail="Фільм не знайдено")
 
-@app.delete("/movies/{id}")
-def delete_movie(id: int = Path(..., gt=0)):
-    for index, movie in enumerate(movies_db):
-        if movie.id == id:
-            del movies_db[index]
-            return {"message": f"Movie with ID {id} deleted."}
-    raise HTTPException(status_code=404, detail="Movie not found.")
+@app.delete("/movies/{movie_id}")
+def delete_movie(movie_id: int):
+    for i, movie in enumerate(movies_db):
+        if movie.id == movie_id:
+            del movies_db[i]
+            return {"detail": "Фільм успішно видалено"}
+    raise HTTPException(status_code=404, detail="Фільм не знайдено")
