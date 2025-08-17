@@ -1,0 +1,7 @@
+<h1>Список товарів</h1>
+<ul>
+  {% for p in products %}
+    <li>{{ p.name }} — {{ p.price }} грн — ⭐ {{ p.rating }}</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'add_product' %}">Додати товар</a>
